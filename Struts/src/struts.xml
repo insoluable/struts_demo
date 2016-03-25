@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd"> 
+ 
+<struts>
+	<!-- devMode is helpful when you want some extra logs for debugging -->
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
+	<constant name="struts.action.extension" value=","/>
+	
+
+	<package name="default" extends="struts-default">
+	
+ 	<interceptors>
+ 		<interceptor-stack name="appDefault">
+        	 <interceptor-ref name="defaultStack">
+      			<param name="exception.logEnabled">true</param>
+      			<param name="exception.logLevel">ERROR</param>
+   			</interceptor-ref>
+ 	    </interceptor-stack>
+	</interceptors>
+		
+	<default-interceptor-ref name="appDefault" />
+		
+     <global-results>
+  		  <result name="error">/error.jsp</result>
+  	  </global-results>
+  		
+
+	    <global-exception-mappings>
+	        <exception-mapping exception="java.lang.Exception" result="error" />
+	   	</global-exception-mappings>
+	  	   	
+	   	
+	   	<action name="listtables" class="com.rustykadai.struts.ListTables">
+			<result name="success">tables.jsp</result>	
+		</action>
+		<action name="listcolumns/*/*" class="com.rustykadai.struts.ListColumns">
+			<param name="owner">{1}</param>
+			<param name="tableName">{2}</param>
+			<result name="success">/columns.jsp</result>			
+		</action>		
+	</package>
+	
+</struts>

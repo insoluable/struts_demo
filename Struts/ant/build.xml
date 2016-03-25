@@ -1,0 +1,83 @@
+<?xml version ="1.0" ?>
+<project default="main">
+
+	<tstamp>
+		<format property="build.date" pattern="dd MMMM yyyy" />
+	</tstamp>
+
+	<property file="build.properties" />
+
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<property name="myclasspath" refid="build.classpath" />
+	<echo message="Classpath = ${myclasspath}" />
+
+	<path id="deploy.classpath">
+		<fileset dir="${deploy.dir}/lib" includes="**/*.jar" />
+	</path>
+
+
+	<target name="main" depends="deploy" />
+
+	<target name="clean">
+
+		<echo>Cleaning up previous build, purging logs...</echo>
+                        
+		<delete dir="${deploy.dir}/data-dictionary" quiet="true" />
+		<delete file="${deploy.dir}/data-dictionary.war" quiet="true"/>
+		<delete dir="${build.dir}" quiet="true" />
+		<delete dir="${dist.dir}" quiet="true"/>
+
+	</target>
+
+	
+	<target name="make-build-dir" depends="clean">
+
+		<mkdir dir="${build.dir}"/>
+	    <mkdir dir="${dist.dir}"  />
+		
+	</target>
+
+
+
+	<target name="compile" depends="make-build-dir">
+
+		<javac srcdir="${src.dir}" destdir="${build.dir}" 
+			debug="on" compiler="${build.compiler}" failonerror="true">
+
+			<classpath refid="build.classpath" />
+
+		</javac>
+
+
+	</target>
+	
+	<target name="deploy-config" depends="compile">
+
+	<copy file="${src.dir}/db.properties" todir="${build.dir}" />
+	<copy file="${src.dir}/log4j2.log" todir="${build.dir}" />
+	<copy file="${src.dir}/log4j2.xml" todir="${build.dir}" />
+	<copy file="${src.dir}/struts.xml" todir="${build.dir}" />
+
+    </target>
+	
+	
+	<target name="war" depends="deploy-config">
+	    <war destfile="${dist.dir}/data-dictionary.war" webxml="../WebContent/WEB-INF/web.xml" update="true">
+	        <fileset dir="../WebContent"/>
+	        <lib dir="../WebContent/WEB-INF/lib"/>
+	        <classes dir="${build.dir}"/>
+	    </war>
+	</target>
+
+    <target name="deploy" depends="war" description="deploy to Tomcat">
+	
+	<copy file="${dist.dir}/data-dictionary.war" todir="${deploy.dir}" />
+        
+    </target>
+
+
+
+</project>
